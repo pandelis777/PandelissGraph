@@ -111,5 +111,8 @@ void free_graph( graph* g ) {
 }
 
 
+type get_data( graph* g, name n ) {
+	return g->data[n];
+}
 
 

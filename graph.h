@@ -38,9 +38,15 @@ name add_node( graph* g, type data );
  */
 void add_edge( graph* g, name A, name B );
 
-/* Frees allocated memory of a grapg* g
+/* Frees allocated memory of a graph* g
  */
 void free_graph( graph* g );
+
+/* 
+ * returns data paired with node named 'n'
+ */
+type get_data( graph* g, name n );
+
 
 
 /* TODO: is_connected_graph() function, returns if the graph represented is a connected one
