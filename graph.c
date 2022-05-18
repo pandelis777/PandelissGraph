@@ -6,48 +6,48 @@ graph* new_graph() {
 	graph* g = (graph*) malloc( 1 *sizeof( graph ) );
 	// TODO: handle malloc failiures
 	g->edges_size = 3;
-	g->edges = (name*) malloc( g->edges_size *sizeof( name ) );
+	g->edges = (size_t*) malloc( g->edges_size *sizeof( size_t ) );
 	g->edges_fill = 0;
-	
+
 	g->data_size = 20;
-	g->data = (type*) malloc( g->data_size *sizeof( type ) );
+	g->data = (void**) malloc( g->data_size *sizeof( void* ) );
 	g->data_fill = 0;
-	
+
 	return g;
 }
 
-name add_node( graph* g, type data ) {
-	
+size_t add_node( graph* g, void* data ) {
+
 	if ( !(g->data_fill < g->data_size) ) {
 		g->data_size += 20;
-		g->data = (type*) realloc( g->data, g->data_size *sizeof( type ) );
-		
+		g->data = (void**) realloc( g->data, g->data_size *sizeof( void* ) );
+
 		assert(g->data == NULL); // TODO: properly handle this case
 	}
-	
+
 	g->data[ g->data_fill ] = data;
 	g->data_fill++;
 
 	return g->data_fill-1;
 }
 
-void add_edge( graph* g, name A, name B ) {
+void add_edge( graph* g, size_t A, size_t B ) {
 	assert( A < g->data_fill && B < g->data_fill ); // TODO: properly handle this case
 
 	if ( g->edges_fill == 0 ) {
 		// TODO: figure out if below if statement is redundant
 		if ( g->edges_fill+3 > g->edges_size ) {
 			g->edges_size = g->edges_fill+3;
-			g->edges = (name*) realloc( g->edges, g->edges_size *sizeof( name ) );
+			g->edges = (size_t*) realloc( g->edges, g->edges_size *sizeof( size_t ) );
 			// TODO: handle realloc failure
 		}
-		
+
 		g->edges[ 0 ] = A;
 		g->edges[ 1 ] = B;
 		g->edges[ 2 ] = A; // cuz bidirectional graph
 		g->edges_fill = 3;
 	} else {
-		
+
 		// make sure either A or B exist in the path
 		int flag = -1; // flag for index of A or B in g->edges
 		for ( size_t i = g->edges_fill-1; i >= 0; i-- ) { // logicaly i>0 might work too
@@ -64,16 +64,16 @@ void add_edge( graph* g, name A, name B ) {
 		// make sure g->edges has enough allocated space
 		if ( g->edges_fill+2 > g->edges_size ) { // TODO: +2 or +1
 			g->edges_size = g->edges_fill+2;
-			g->edges = (name*) realloc( g->edges, g->edges_size *sizeof( name ) );
+			g->edges = (size_t*) realloc( g->edges, g->edges_size *sizeof( size_t ) );
 			// TODO: handle realloc failure
-		}		
-	
+		}
+
 		// shift all elements after A or B of path by 2 to the left
 		for ( size_t i = g->edges_fill-1; i > flag; i-- ) {
-			g->edges[ i+2 ] = g->edges[ i ];	
+			g->edges[ i+2 ] = g->edges[ i ];
 		}
 		g->edges_fill += 2;
-		
+
 		// insert BA or AB so that its ABA or BAB to path
 		g->edges[ flag+1 ] = (g->edges[ flag ] == A) ? B : A;
 		g->edges[ flag+2 ] = g->edges[ flag ];
@@ -83,7 +83,7 @@ void add_edge( graph* g, name A, name B ) {
 	return;
 }
 
-void remove_edge( graph* g, name A, name B ) {
+void remove_edge( graph* g, size_t A, size_t B ) {
 	// TODO: :( not yet implemented
 	return;
 }
@@ -97,17 +97,17 @@ void free_graph( graph* g ) {
 	if ( g->data != NULL ) {
 		free( g->data );
 	}
-		
+
 	free( g );
 	return;
 }
 
 
-type get_data( graph* g, name n ) {
+void* get_data( graph* g, size_t n ) {
 	return g->data[n];
 }
 
-void print_trivial_paths( graph* g, name start, name end ) {
+void print_trivial_paths( graph* g, size_t start, size_t end ) {
 
 	// locate first occourance of 'start' in g->edges
 	size_t st_index;
@@ -118,17 +118,17 @@ void print_trivial_paths( graph* g, name start, name end ) {
 		}
 	}
 	assert( g->edges[ st_index ] == start ); // TODO: remove later
-	
 
-	name* path = (name*) malloc( get_node_count( g ) *sizeof(name) );
-	int* map = (int*) calloc( get_node_count( g ), sizeof(name) );
-       	name* path_iter = path;
-	
+
+	size_t* path = (size_t*) malloc( get_node_count( g ) *sizeof(size_t) );
+	int* map = (int*) calloc( get_node_count( g ), sizeof(size_t) );
+       	size_t* path_iter = path;
+
 	path[ 0 ] = start;
 	path_iter++;
 	map[ start ] = 1;
 	for ( size_t i = st_index +1; i != st_index; i = (i+1) % g->edges_fill ) {
-		
+
 		if ( map[g->edges[ i ]] != 0 ) {
 			while ( *(path_iter-1) != g->edges[ i ] ) {
 				path_iter--;
@@ -145,9 +145,9 @@ void print_trivial_paths( graph* g, name start, name end ) {
 					printf( "%zu ", path[i] );
 				}
 				printf( "\n" );
-			
-				 
-			
+
+
+
 			}
 		}
 
@@ -164,7 +164,7 @@ size_t get_node_count( graph* g ) {
 	return g->data_fill;
 }
 
-void get_all_paths( graph* g, name A, name B ) {
+void get_all_paths( graph* g, size_t A, size_t B ) {
 	size_t st_index;
 	for ( st_index = 0; g->edges[ st_index ] != start; st_index++ ) {
 		if ( st_index+1 >= g->edges_fill ) {
@@ -174,13 +174,8 @@ void get_all_paths( graph* g, name A, name B ) {
 	}
 
 
-	for ( 
+	for (
 
 
 
 }
-
-
-
-
-
