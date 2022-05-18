@@ -164,7 +164,21 @@ size_t get_node_count( graph* g ) {
 	return g->data_fill;
 }
 
+void get_all_paths( graph* g, name A, name B ) {
+	size_t st_index;
+	for ( st_index = 0; g->edges[ st_index ] != start; st_index++ ) {
+		if ( st_index+1 >= g->edges_fill ) {
+			// start doesnt exist in path, TODO: handle it
+			return;
+		}
+	}
 
+
+	for ( 
+
+
+
+}
 
 
 
