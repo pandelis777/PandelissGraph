@@ -47,6 +47,11 @@ void free_graph( graph* g );
  */
 type get_data( graph* g, name n );
 
+/* get_node_count returns number of nodes in graph */
+size_t get_node_count( graph* g );
+
+/* removes an edge from the graph */
+void remove_edge( graph* g, name A, name B );
 
 
 /* TODO: is_connected_graph() function, returns if the graph represented is a connected one
